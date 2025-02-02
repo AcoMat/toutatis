@@ -110,8 +110,9 @@ def main():
 
     infos = infos["user"]
     
-    print(infos["user"])  # Agregar esta línea antes de la línea 115
-
+ # Agregar esta línea antes de la línea 115
+    print(infos)
+    
     print("Informations about     : " + infos["username"])
     print("userID                 : " + infos["userID"])
     print("Linked WhatsApp        : " + str(infos["is_whatsapp_linked"]))
