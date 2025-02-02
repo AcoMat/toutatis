@@ -1,5 +1,6 @@
 import argparse
 import requests
+import json
 from json import decoder
 
 
@@ -37,12 +38,17 @@ def getInfo(username, sessionId):
             return {"user": None, "error": "Rate limit"}
 
         response.raise_for_status()
-        info_user = response.json().get("user", {})
+        info_user = response.json()
+
+        # Imprime la respuesta completa de la API
+        print("\n📢 API Response:\n", json.dumps(info_user, indent=4))
+
+        user_data = info_user.get("user", {})
 
         return {
-            "username": info_user.get("username", "Unknown"),
-            "email": info_user.get("public_email", "No email found"),
-            "phone": f'+{info_user.get("public_phone_country_code", "")} {info_user.get("public_phone_number", "No phone found")}'
+            "username": user_data.get("username", "Unknown"),
+            "email": user_data.get("public_email", "No email found"),
+            "phone": f'+{user_data.get("public_phone_country_code", "")} {user_data.get("public_phone_number", "No phone found")}'
         }
 
     except requests.exceptions.RequestException:
@@ -60,6 +66,7 @@ def main():
     if "error" in result:
         print(result["error"])
     else:
+        print(f"\n✅ Extracted Data:")
         print(f"Username: {result['username']}")
         print(f"Email: {result['email']}")
         print(f"Phone: {result['phone']}")
@@ -67,4 +74,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
