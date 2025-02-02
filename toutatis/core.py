@@ -29,7 +29,9 @@ def getUserId(username, sessionsId):
         return {"id": None, "error": "Rate limit"}
 
 
-def getInfo(search, sessionId, searchType="username" or "id"):
+def getInfo(search, sessionId, searchType="username"):
+    searchType = "username" if searchType == "username" else "id"
+
     if searchType == "username":
         data = getUserId(search, sessionId)
         if data["error"]:
@@ -80,7 +82,6 @@ def advanced_lookup(username):
             "X-IG-App-ID": "124024574287414",
             "Accept-Encoding": "gzip, deflate",
             "Host": "i.instagram.com",
-            # "X-FB-HTTP-Engine": "Liger",
             "Connection": "keep-alive",
             "Content-Length": str(len(data))
         },
@@ -90,7 +91,7 @@ def advanced_lookup(username):
     try:
         return ({"user": api.json(), "error": None})
     except decoder.JSONDecodeError:
-        return ({"user": None, "error": "rate limit"})
+        return ({"user": None, "error": "Rate limit"})
 
 
 def main():
@@ -105,56 +106,60 @@ def main():
     search_type = "id" if args.id else "username"
     search = args.id or args.username
     infos = getInfo(search, sessionsId, searchType=search_type)
+    
     if not infos.get("user"):
         exit(infos["error"])
 
     infos = infos["user"]
-    
- # Agregar esta línea antes de la línea 115
-    print(str(infos))
-    
-    print("Informations about     : " + infos["username"])
-    print("userID                 : " + infos["userID"])
-    print("Linked WhatsApp        : " + str(infos["is_whatsapp_linked"]))
-    if "public_email" in infos.keys():
-        if infos["public_email"]:
-            print("Public Email           : " + infos["public_email"])
 
-    if "public_phone_number" in infos.keys():
-        if str(infos["public_phone_number"]):
-            phonenr = "+" + str(infos["public_phone_country_code"]) + " " + str(infos["public_phone_number"])
-            try:
-                pn = phonenumbers.parse(phonenr)
-                countrycode = region_code_for_country_code(pn.country_code)
-                country = pycountry.countries.get(alpha_2=countrycode)
-                phonenr = phonenr + " ({}) ".format(country.name)
-            except:  # except what ??
-                pass  # pass what ??
-            print("Public Phone number    : " + phonenr)
+    # 🔹 Imprime los datos completos para depuración
+    print(dumps(infos, indent=4))  
+
+    print("Informations about     : " + infos.get("username", "Unknown"))
+    print("userID                 : " + infos.get("userID", "Unknown"))
+    print("Linked WhatsApp        : " + str(infos.get("is_whatsapp_linked", "Unknown")))
+    print("Verified Profile       : " + str(infos.get("is_verified", "Unknown")))
+
+    if infos.get("public_email"):
+        print("Public Email           : " + infos["public_email"])
+
+    if infos.get("public_phone_number"):
+        phone_country = infos.get("public_phone_country_code", "")
+        phone_number = infos.get("public_phone_number", "")
+        phonenr = f"+{phone_country} {phone_number}"
+
+        try:
+            pn = phonenumbers.parse(phonenr)
+            countrycode = region_code_for_country_code(pn.country_code)
+            country = pycountry.countries.get(alpha_2=countrycode)
+            phonenr = f"{phonenr} ({country.name})"
+        except Exception as e:
+            print(f"Error procesando número de teléfono: {e}")
+
+        print("Public Phone number    : " + phonenr)
 
     other_infos = advanced_lookup(infos["username"])
 
-    if other_infos["error"] == "rate limit":
+    if other_infos["error"] == "Rate limit":
         print("Rate limit please wait a few minutes before you try again")
 
-    elif "message" in other_infos["user"].keys():
-        if other_infos["user"]["message"] == "No users found":
-            print("The lookup did not work on this account")
-        else:
-            print(other_infos["user"]["message"])
-
+    elif other_infos["user"].get("message") == "No users found":
+        print("The lookup did not work on this account")
     else:
-        if "obfuscated_email" in other_infos["user"].keys():
-            if other_infos["user"]["obfuscated_email"]:
-                print("Obfuscated email       : " + other_infos["user"]["obfuscated_email"])
-            else:
-                print("No obfuscated email found")
+        if other_infos["user"].get("obfuscated_email"):
+            print("Obfuscated email       : " + other_infos["user"]["obfuscated_email"])
+        else:
+            print("No obfuscated email found")
 
-        if "obfuscated_phone" in other_infos["user"].keys():
-            if str(other_infos["user"]["obfuscated_phone"]):
-                print("Obfuscated phone       : " + str(other_infos["user"]["obfuscated_phone"]))
-            else:
-                print("No obfuscated phone found")
+        if other_infos["user"].get("obfuscated_phone"):
+            print("Obfuscated phone       : " + str(other_infos["user"]["obfuscated_phone"]))
+        else:
+            print("No obfuscated phone found")
+
     print("-" * 24)
-    print("Profile Picture        : " + infos["hd_profile_pic_url_info"]["url"])
-        
+    print("Profile Picture        : " + infos.get("hd_profile_pic_url_info", {}).get("url", "Unknown"))
+
+
+if __name__ == "__main__":
+    main()
+    
