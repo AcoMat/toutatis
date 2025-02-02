@@ -1,10 +1,18 @@
+import argparse
 import phonenumbers
 import pycountry
 from phonenumbers import region_code_for_country_code
 
+# Crear el parser de argumentos
+parser = argparse.ArgumentParser(description='Obtener información de usuario de Instagram')
+parser.add_argument('-u', '--username', type=str, help='Nombre de usuario de Instagram', required=True)
+parser.add_argument('-s', '--sessionid', type=str, help='ID de sesión de Instagram', required=True)
+args = parser.parse_args()
+
 # Asegúrate de que se han obtenido correctamente los datos de la cuenta
-search = args.id or args.username
-infos = getInfo(search, sessionsId, searchType=search_type)
+search = args.username
+sessionid = args.sessionid
+infos = getInfo(search, sessionid)
 
 if not infos.get("user"):
     exit(infos["error"])
