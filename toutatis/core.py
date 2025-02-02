@@ -111,7 +111,7 @@ def main():
     infos = infos["user"]
     
  # Agregar esta línea antes de la línea 115
-    print(infos)
+    print(str(infos))
     
     print("Informations about     : " + infos["username"])
     print("userID                 : " + infos["userID"])
