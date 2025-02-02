@@ -112,7 +112,6 @@ def main():
 
     print("Informations about     : " + infos["username"])
     print("userID                 : " + infos["userID"])
-    print("Full Name              : " + infos["full_name"])
     print("Verified               : " + str(infos['is_verified']) + " | Is buisness Account : " + str(
         infos["is_business"]))
     print("Is private Account     : " + str(infos["is_private"]))
