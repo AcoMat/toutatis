@@ -109,24 +109,12 @@ def main():
         exit(infos["error"])
 
     infos = infos["user"]
+    
+    print(infos["user"])  # Agregar esta línea antes de la línea 115
 
     print("Informations about     : " + infos["username"])
     print("userID                 : " + infos["userID"])
-    print("Verified               : " + str(infos['is_verified']) + " | Is buisness Account : " + str(
-        infos["is_business"]))
-    print("Is private Account     : " + str(infos["is_private"]))
-    print(
-        "Follower               : " + str(infos["follower_count"]) + " | Following : " + str(infos["following_count"]))
-    print("Number of posts        : " + str(infos["media_count"]))
-    # print("Number of tag in posts : "+str(infos["following_tag_count"]))
-    if infos["external_url"]:
-        print("External url           : " + infos["external_url"])
-    print("IGTV posts             : " + str(infos["total_igtv_videos"]))
-    print("Biography              : " + (f"""\n{" " * 25}""").join(infos["biography"].split("\n")))
     print("Linked WhatsApp        : " + str(infos["is_whatsapp_linked"]))
-    print("Memorial Account       : " + str(infos["is_memorialized"]))
-    print("New Instagram user     : " + str(infos["is_new_to_instagram"]))
-
     if "public_email" in infos.keys():
         if infos["public_email"]:
             print("Public Email           : " + infos["public_email"])
